@@ -1,19 +1,27 @@
 import vtk
-
-def nii_2_mesh (filename_nii, filename_stl, label):
+import argparse
+parser = argparse.ArgumentParser(description='Convert .nii files to .stl')
+parser.add_argument('infile', type=str, help='Input file (.nii)')
+parser.add_argument('outfile', type=str, help='Output file (no suffix)')
+args = parser.parse_args()
+print('the infile is')
+print(args.infile)
+print('the outfile is')
+print(args.outfile)
+def nii_2_mesh (infile, outfile, label):
 
     """
     Read a nifti file including a binary map of a segmented organ with label id = label. 
     Convert it to a smoothed mesh of type stl.
 
-    filename_nii     : Input nifti binary map 
+    args.infile     : Input nifti binary map 
     filename_stl     : Output mesh name in stl format
     label            : segmented label id 
     """
 
     # read the file
     reader = vtk.vtkNIFTIImageReader()
-    reader.SetFileName(filename_nii)
+    reader.SetFileName(args.infile)
     reader.Update()
     
     # apply marching cube surface generation
@@ -38,11 +46,11 @@ def nii_2_mesh (filename_nii, filename_stl, label):
     writer = vtk.vtkSTLWriter()
     writer.SetInputConnection(smoother.GetOutputPort())
     writer.SetFileTypeToASCII()
-    writer.SetFileName(filename_stl)
+    writer.SetFileName(args.outfile)
     writer.Write()
 if __name__ == '__main__':
     
-    filename_nii =  '01.nii.gz'
-    filename_stl = '01.stl'
+    #args.infile =  'test.nii.gz'
+    #args.outfile = 'test.stl'
     label = 1
-    nii_2_mesh (filename_nii, filename_stl, label)
+    nii_2_mesh (args.infile, args.outfile, label)
